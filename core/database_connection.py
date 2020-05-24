@@ -7,7 +7,7 @@ class Database:
     connection be cautious to this.
     """
 
-    def __init__(self, user="root", passwd="jacaum123", db="captalys", host="localhost", port=3306):
+    def __init__(self, user="root", passwd="secrets", db="captalys", host="database", port=3306):
         """
         Params:
             user: str()
