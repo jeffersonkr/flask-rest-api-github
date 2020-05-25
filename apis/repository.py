@@ -115,6 +115,8 @@ class get_public_repository_detail(Resource):
         if r.status_code == 200:
             # insere os dados do usuario no banco de dados.
             user_dao.create(r.json()['owner'])
+            # insere os dados do repositorio no banco de dados.
+            repos_dao.create(r.json())
             return r.json()
         else:
             return jsonify({
@@ -123,7 +125,7 @@ class get_public_repository_detail(Resource):
             })
 
     def get(self, username, repository_name):
-        """Call internal method.
+        """Return repository details.
 
         Params:
             username: str()
@@ -196,7 +198,7 @@ class get_public_repository(Resource):
         return repos_name.replace(f"{username}/", "")
 
     def get(self, username):
-        """Call internal method.
+        """Username's public repositories.
 
         Params:
             username: str()
