@@ -1,8 +1,9 @@
-from core.database_connection import db
 from flask import jsonify
 from flask import Response
 import json
 from MySQLdb._exceptions import IntegrityError
+
+from core.database_connection import Database
 
 
 class UserDAO(object):
@@ -11,7 +12,7 @@ class UserDAO(object):
     def __init__(self):
         """Init with connection database imported"""
 
-        self.connection = db
+        self._connection = Database()
 
     @property
     def users(self):
@@ -25,14 +26,14 @@ class UserDAO(object):
     def _get_users(self):
         """Internal method to get all users from database."""
 
-        cursor = self.connection.cursor()
-        cursor.execute("SELECT * FROM user;")
-        data = cursor.fetchall()
+        query = "SELECT * FROM user;"
+        data = self._connection.execute_query_fetchall(query)
 
         # get column names of user table from database.
-        cursor.execute("""SELECT COLUMN_NAME FROM information_schema.columns 
+        query = ("""SELECT COLUMN_NAME FROM information_schema.columns
                             WHERE table_schema='captalys' AND table_name='user'""")
-        column = cursor.fetchall()
+        column = self._connection.execute_query_fetchall(query)
+
         # get data outside tuples
         column = [i[0] for i in column]
         # zip columns and values
@@ -43,14 +44,26 @@ class UserDAO(object):
     def create(self, data):
         """Insert into database user."""
 
-        cursor = self.connection.cursor()
         # prepare sql query to insert user
-        placeholders = ', '.join(['%s'] * len(data))
         columns = ', '.join(data.keys())
-        sql = f"INSERT INTO user({columns}) VALUES({placeholders})"
+
+        def tratamento(x):
+            if isinstance(x, bool):
+                return str(x).upper()
+            elif x is None:
+                return "NULL"
+            elif isinstance(x, int):
+                return str(x)
+            else:
+                return "'"+str(x)+"'"
+
+        dados_list = list(data.values())
+        values = ", ".join(list(map(tratamento, dados_list)))
+
+        sql = f"INSERT INTO user({columns}) VALUES({values})"
+
         try:
-            cursor.execute(sql, list(data.values()))
-            self.connection.commit()
+            self._connection.execute_query_commit(sql)
             return jsonify(success=True)
         except Exception as e:
             # if IntegrityError cause by duplicated.
@@ -61,21 +74,22 @@ class UserDAO(object):
     def update(self, data):
         """Update user into database."""
 
-        cursor = self.connection.cursor()
         # prepare update set query
         set_query = ""
         for k, v in data.items():
-            # in case values is boolean convert to int and then to string
             if isinstance(v, bool):
-                set_query += k + '=' + str(int(v)) + ", "
-            # every else convert to string
+                set_query += k + '=' + str(v).upper() + ", "
+            elif v is None:
+                set_query += k + '=' + "NULL" + ", "
+            elif isinstance(v, int):
+                set_query += k + '=' + str(v) + ", "
             else:
-                set_query += k + '=' + "'" + str(v) + "'" + ", "
+                set_query += k + '=' + "'"+str(v)+"'" + ", "
+
         sql = f"UPDATE user set {set_query[:-2]} where id={data['id']}"
+
         try:
-            print(sql)
-            cursor.execute(sql)
-            self.connection.commit()
+            self._connection.execute_query_commit(sql)
             return jsonify(success=True)
         except Exception as e:
             print(e)

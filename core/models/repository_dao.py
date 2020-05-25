@@ -3,7 +3,7 @@ from flask import jsonify
 from flask import Response
 import json
 
-from core.database_connection import db
+from core.database_connection import Database
 
 
 class RepositoryDAO(object):
@@ -12,7 +12,7 @@ class RepositoryDAO(object):
     def __init__(self):
         """Init with connection database imported"""
 
-        self.connection = db
+        self._connection = Database()
 
     def get(self, user_id):
         """
@@ -24,9 +24,8 @@ class RepositoryDAO(object):
         """
 
         query = f"SELECT * from repository where owner={user_id}"
-        cursor = self.connection.cursor()
-        cursor.execute(query)
-        return [i for i in cursor.fetchall()]
+        data = self._connection.execute_query_fetchall(query)
+        return [i for i in data]
 
     def create(self, data):
         """
@@ -61,17 +60,27 @@ class RepositoryDAO(object):
         data['source'] = data['source']['id'] \
             if data.get('source') else None
 
-        cursor = self.connection.cursor()
-
         # cria se a query para inserir no banco de dados
-        placeholders = ', '.join(['%s'] * len(data))
         columns = ', '.join(data.keys())
-        sql = f"""INSERT INTO repository({columns}) VALUES({placeholders});"""
+
+        def tratamento(x):
+            if isinstance(x, bool):
+                return str(x).upper()
+            elif x is None:
+                return "NULL"
+            elif isinstance(x, int):
+                return str(x)
+            else:
+                return "'"+str(x)+"'"
+
+        dados_list = list(data.values())
+        values = ", ".join(list(map(tratamento, dados_list)))
+        sql = f"""INSERT INTO repository({columns}) VALUES({values});"""
         try:
-            cursor.execute(sql, list(data.values()))
-            self.connection.commit()
+            self._connection.execute_query_commit(sql)
             return jsonify(success=True)
         except Exception as e:
+            print(e)
             # Caso de erro de integridade sabe-se
             # que é erro de duplicidade por isso
             # enviamos chamamos o update
@@ -89,11 +98,10 @@ class RepositoryDAO(object):
             return jsonify(sucess=True)
         """
 
-        cursor = self.connection.cursor()
         # prepara query de update
         set_query = ""
         for k, v in data.items():
-            # caso valor seja bolean converte para o boolean
+            # caso valor seja bolean converte o boolean
             # para inteiro e depois para string
             if isinstance(v, bool):
                 set_query += k + '=' + str(int(v)) + ", "
@@ -106,8 +114,7 @@ class RepositoryDAO(object):
         # set_query[:-2] para remover o ultima virgula e espaço adicionado.
         sql = f"UPDATE repository set {set_query[:-2]} where id={data['id']}"
         try:
-            cursor.execute(sql)
-            self.connection.commit()
+            self._connection.execute_query_commit(sql)
             return jsonify(success=True)
         except Exception as e:
             print(e)
