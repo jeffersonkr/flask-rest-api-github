@@ -1,0 +1,11 @@
+[run]
+concurrency = multiprocessing
+omit = database/*
+        test/*
+        wsgi.py
+        app.py
+data_file = htmlcov/.coverage
+
+[report]
+exclude_lines =
+    if __name__ == .__main__.:
