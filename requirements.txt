@@ -4,6 +4,7 @@ autopep8==1.5.2
 certifi==2020.4.5.1
 chardet==3.0.4
 click==7.1.2
+coverage==5.1
 Flask==1.1.2
 Flask-MySQLdb==0.2.0
 flask-restplus==0.13.0
@@ -22,11 +23,12 @@ pycodestyle==2.6.0
 pyparsing==2.4.7
 pyrsistent==0.16.0
 pytest==5.4.2
+pytest-cov==2.9.0
 pytz==2020.1
 requests==2.23.0
 six==1.15.0
 urllib3==1.25.9
 uWSGI==2.0.18
 wcwidth==0.1.9
-Werkzeug== 0.16.0 # versão mais atual esta dando problema com flask restplus
+Werkzeug==0.16.0
 zipp==3.1.0
