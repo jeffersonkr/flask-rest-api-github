@@ -118,3 +118,13 @@ class RepositoryDAO(object):
             return jsonify(success=True)
         except Exception as e:
             print(e)
+
+    def get_columns_names(self):
+        """Get columns name from table repository."""
+
+        query = """SELECT COLUMN_NAME FROM information_schema.columns
+                    WHERE table_schema='captalys' AND table_name='repository'"""
+        columns = self._connection.execute_query_fetchall(query)
+        columns = [i[0] for i in columns]
+
+        return columns

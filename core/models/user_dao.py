@@ -28,17 +28,25 @@ class UserDAO(object):
 
         query = "SELECT * FROM user;"
         data = self._connection.execute_query_fetchall(query)
-
-        # get column names of user table from database.
-        query = ("""SELECT COLUMN_NAME FROM information_schema.columns
-                            WHERE table_schema='captalys' AND table_name='user'""")
-        column = self._connection.execute_query_fetchall(query)
-
-        # get data outside tuples
-        column = [i[0] for i in column]
+        column = self.get_columns_name()
         # zip columns and values
         data = [dict(zip(column, list(i))) for i in data]
 
+        return data
+
+    def get_columns_name(self):
+        """Get column name from user table."""
+
+        query = ("""SELECT COLUMN_NAME FROM information_schema.columns
+                            WHERE table_schema='captalys' AND table_name='user'""")
+        column = self._connection.execute_query_fetchall(query)
+        column = [i[0] for i in column]
+
+        return column
+
+    def get_user_by_id(self, id):
+        query = f"SELECT * FROM user WHERE id={id};"
+        data = self._connection.execute_query_fetchall(query)
         return data
 
     def create(self, data):
