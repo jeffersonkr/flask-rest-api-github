@@ -2,9 +2,10 @@
 
 # Flask REST API - GITHUB
 This is an Flask REST API software for fetch data from github and save at MYSQL database to retrieve data when needed.
-Currently for this project we just fetch 2 end-point with are for user and repositories details.
+Currently for this project we just fetch three end-point with are for user and repositories details.
  - `https://api.github.com/users/<username>/repos`
  - `https://api.github.com/users/<username>`
+ - `https://api.github.com/repos/<username>/<repository_name>`
 
 -----------------------------------------------------------------
 ## HOW TO START:
