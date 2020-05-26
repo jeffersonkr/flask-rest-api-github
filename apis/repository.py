@@ -176,8 +176,8 @@ class get_public_repository(Resource):
             return repository_names
         else:
             error_msg = {
-                "status": r.status_code,
-                "description": r.json()
+                "status": r_repos.status_code,
+                "description": r_repos.json()
             }
             return error_msg
 
