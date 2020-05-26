@@ -1,9 +1,6 @@
 from flask_restplus import Namespace, Resource, fields
 from core.models.user_dao import UserDAO
 from core.models.repository_dao import RepositoryDAO
-from flask import jsonify
-import requests
-from core.database_connection import Database
 
 api = Namespace('User', description='github user operations')
 
@@ -67,21 +64,18 @@ class UserAndRepositoriesDetail(Resource):
         if not id.isnumeric():
             api.abort(400)
 
-        for user in user_dao.users:
-            if user['id'] == int(id):
-                user_repositories = repos_dao.get(id)
-                # get column names of user table from database.
-                query = ("""SELECT COLUMN_NAME FROM information_schema.columns
-                            WHERE table_schema='captalys' AND table_name='repository'""")
-                connection = Database()
-                columns = connection.execute_query_fetchall(query)
-                columns = [i[0] for i in columns]
-                repositories_dict = [
-                    dict(zip(columns, i)) for i in user_repositories]
-                data = {
-                    'user': user,
-                    'repositories': repositories_dict
-                }
-                return data, 200
+        user = user_dao.get_user_by_id(id)
+        if user:
+            user_column = user_dao.get_columns_name()
+            user = dict(zip(user_column, user[0]))
+            user_repositories = repos_dao.get(id)
+            columns = repos_dao.get_columns_names()
+            repositories_dict = [
+                dict(zip(columns, i)) for i in user_repositories]
+            data = {
+                'user': user,
+                'repositories': repositories_dict
+            }
+            return data, 200
 
         api.abort(404)
