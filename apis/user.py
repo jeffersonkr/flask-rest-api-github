@@ -48,11 +48,11 @@ repos_dao = RepositoryDAO()
 @api.route('/')
 class UserList(Resource):
     @api.doc('list user')
-    @api.marshal_with(user, code=201, mask=False)
+    @api.marshal_with(user, code=200, mask=False)
     def get(self):
         '''List all users'''
 
-        return user_dao.users, 201
+        return user_dao.users, 200
 
 
 @api.route('/<id>')
