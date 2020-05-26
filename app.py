@@ -2,12 +2,6 @@ from flask import Flask
 from apis import api
 
 app = Flask(__name__)
-app.config['MYSQL_HOST'] = "database"
-app.config['MYSQL_USER'] = "root"
-app.config['MYSQL_PASSWORD'] = "secret"
-app.config['MYSQL_DB'] = "captalys"
-app.config['MYSQL_PORT'] = 3306
-
 api.init_app(app)
 
 if __name__ == '__main__':
