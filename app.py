@@ -1,9 +1,5 @@
 from flask import Flask
-from flask_restplus import Resource, Api
-from flask import jsonify
-import requests
 from apis import api
-import subprocess, os
 
 app = Flask(__name__)
 app.config['MYSQL_HOST'] = "database"
