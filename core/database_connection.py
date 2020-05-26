@@ -45,6 +45,10 @@ class Database:
     def execute_query_commit(self, query):
         """Open a new connection and a cursor, execute 
         query, commit then close cursor and connection.
+
+        Params:
+            query: str()
+                sql query synthax
         """
 
         conn = self._connect_database()
@@ -60,6 +64,10 @@ class Database:
     def execute_query_fetchall(self, query):
         """Open a new connection and a cursor, execute 
         query, fetchall then close cursor and connection.
+
+        Params:
+            query: str()
+                sql query synthax
 
         Return: fetched data from database
         """
